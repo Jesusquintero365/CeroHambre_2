@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>CeroHambre | Reportes</title>
+
+    <link rel="stylesheet"
+          href="Css/Styles.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        CeroHambre
+    </div>
+
+    <nav>
+
+        <a href="dashboard.html">
+            Inicio
+        </a>
+
+        <a href="donaciones.html">
+            Donaciones
+        </a>
+
+        <a href="solicitudes.html">
+            Solicitudes
+        </a>
+
+        <a href="entregas.html">
+            Entregas
+        </a>
+
+        <a href="reportes.html">
+            Reportes
+        </a>
+
+    </nav>
+
+    <div class="acciones">
+
+        <span id="nombreUsuario">
+            Usuario
+        </span>
+
+        <button onclick="cerrarSesion()">
+            Cerrar sesión
+        </button>
+
+    </div>
+
+</header>
+
+
+<main class="dashboard">
+
+    <section class="dashboard-bienvenida">
+
+        <div>
+
+            <span class="etiqueta">
+                Resultados e impacto
+            </span>
+
+            <h1>
+                Reportes
+            </h1>
+
+            <p>
+                Consulta el impacto generado por CeroHambre
+                mediante la recuperación y entrega de alimentos.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="dashboard-seccion">
+
+        <div class="dashboard-titulo">
+
+            <div>
+
+                <span>
+                    Impacto
+                </span>
+
+                <h2>
+                    Resultados de CeroHambre
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div id="reportesContainer">
+
+            <div class="actividad-card">
+
+                <div class="actividad-vacia">
+
+                    <div class="actividad-icono">
+                        📊
+                    </div>
+
+                    <h3>
+                        Cargando reportes...
+                    </h3>
+
+                    <p>
+                        Estamos consultando los datos
+                        registrados en CeroHambre.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="dashboard-impacto">
+
+        <div>
+
+            <span>
+                ODS 2 – Hambre Cero
+            </span>
+
+            <h2>
+                Cada alimento recuperado cuenta.
+            </h2>
+
+            <p>
+                CeroHambre busca conectar los alimentos
+                disponibles con organizaciones que los necesitan,
+                contribuyendo a reducir el desperdicio y apoyar
+                la seguridad alimentaria.
+            </p>
+
+        </div>
+
+        <div class="impacto-numero">
+
+            <strong id="impactoKg">
+                0
+            </strong>
+
+            <span>
+                kg recuperados
+            </span>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <div>
+
+        <strong>
+            CeroHambre
+        </strong>
+
+        <p>
+            Una iniciativa tecnológica para contribuir
+            al ODS 2 – Hambre Cero.
+        </p>
+
+    </div>
+
+    <div>
+
+        <p>
+            © 2026 CeroHambre
+        </p>
+
+    </div>
+
+</footer>
+
+
+<script src="Js/App.js"></script>
+
+</body>
+
+</html>

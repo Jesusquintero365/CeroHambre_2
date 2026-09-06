@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CeroHambre | Dashboard</title>
+
+    <link rel="stylesheet" href="Css/Styles.css">
+</head>
+
+<body>
+
+    <!-- ==================================================
+         BARRA SUPERIOR
+    =================================================== -->
+
+    <header>
+
+        <div class="logo">
+            CeroHambre
+        </div>
+
+        <nav>
+
+            <a href="index.html">
+                Inicio
+            </a>
+
+            <a href="donaciones.html">
+                Donaciones
+            </a>
+
+            <a href="solicitudes.html">
+                Solicitudes
+            </a>
+
+            <a href="reportes.html">
+                Reportes
+            </a>
+
+            <a href="entregas.html">
+                Entregas
+            </a>
+
+        </nav>
+
+        <div class="acciones">
+
+            <span id="nombreUsuario">
+                Usuario
+            </span>
+
+            <button onclick="cerrarSesion()">
+                Cerrar sesión
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- ==================================================
+         CONTENIDO PRINCIPAL
+    =================================================== -->
+
+    <main class="dashboard">
+
+
+        <!-- ==================================================
+             BIENVENIDA
+        =================================================== -->
+
+        <section class="dashboard-bienvenida">
+
+            <div>
+
+                <span class="etiqueta">
+                    Panel de control
+                </span>
+
+                <h1>
+                    Bienvenido a CeroHambre
+                </h1>
+
+                <p>
+                    Gestiona tus donaciones, solicitudes y entregas
+                    desde un solo lugar y contribuye a reducir el
+                    desperdicio de alimentos.
+                </p>
+
+            </div>
+
+
+            <!-- ENLACE DIRECTO -->
+
+            <a
+                href="publicar-donacion.html"
+                class="btn-principal"
+            >
+                + Publicar donación
+            </a>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             INDICADORES
+        =================================================== -->
+
+        <section class="dashboard-estadisticas">
+
+
+            <!-- DONACIONES -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    🍎
+                </div>
+
+                <div>
+
+                    <span>
+                        Donaciones
+                    </span>
+
+                    <strong id="totalDonaciones">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- SOLICITUDES -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    📋
+                </div>
+
+                <div>
+
+                    <span>
+                        Solicitudes
+                    </span>
+
+                    <strong id="totalSolicitudes">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- ENTREGAS -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    🚚
+                </div>
+
+                <div>
+
+                    <span>
+                        Entregas
+                    </span>
+
+                    <strong id="totalEntregas">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- ALIMENTOS -->
+
+            <div class="dashboard-card">
+
+                <div class="card-icon">
+                    🌱
+                </div>
+
+                <div>
+
+                    <span>
+                        Alimentos recuperados
+                    </span>
+
+                    <strong id="alimentosRecuperados">
+                        0
+                    </strong>
+
+                    <small>
+                        kg
+                    </small>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             ACCIONES RÁPIDAS
+        =================================================== -->
+
+        <section class="dashboard-seccion">
+
+            <div class="dashboard-titulo">
+
+                <div>
+
+                    <span>
+                        Acciones rápidas
+                    </span>
+
+                    <h2>
+                        ¿Qué quieres hacer?
+                    </h2>
+
+                    <p>
+                        Accede rápidamente a las principales
+                        funciones de CeroHambre.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="acciones-dashboard">
+
+
+                <!-- PUBLICAR DONACIÓN -->
+
+                <a
+                    href="publicar-donacion.html"
+                    class="accion-card"
+                >
+
+                    <span class="accion-icono">
+                        🍎
+                    </span>
+
+                    <strong>
+                        Publicar donación
+                    </strong>
+
+                    <p>
+                        Comparte alimentos disponibles
+                        para ayudar a otras organizaciones.
+                    </p>
+
+                    <span class="accion-enlace">
+                        Publicar ahora →
+                    </span>
+
+                </a>
+
+
+
+                <!-- DONACIONES -->
+
+                <a
+                    href="donaciones.html"
+                    class="accion-card"
+                >
+
+                    <span class="accion-icono">
+                        🥕
+                    </span>
+
+                    <strong>
+                        Explorar alimentos
+                    </strong>
+
+                    <p>
+                        Consulta los alimentos disponibles
+                        dentro de la plataforma.
+                    </p>
+
+                    <span class="accion-enlace">
+                        Ver donaciones →
+                    </span>
+
+                </a>
+
+
+
+                <!-- SOLICITUDES -->
+
+                <a
+                    href="solicitudes.html"
+                    class="accion-card"
+                >
+
+                    <span class="accion-icono">
+                        📋
+                    </span>
+
+                    <strong>
+                        Gestionar solicitudes
+                    </strong>
+
+                    <p>
+                        Revisa las solicitudes relacionadas
+                        con tus donaciones.
+                    </p>
+
+                    <span class="accion-enlace">
+                        Ver solicitudes →
+                    </span>
+
+                </a>
+
+
+
+                <!-- REPORTES -->
+
+                <a
+                    href="reportes.html"
+                    class="accion-card"
+                >
+
+                    <span class="accion-icono">
+                        📊
+                    </span>
+
+                    <strong>
+                        Consultar impacto
+                    </strong>
+
+                    <p>
+                        Analiza los resultados y el impacto
+                        generado por CeroHambre.
+                    </p>
+
+                    <span class="accion-enlace">
+                        Ver reportes →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             ACTIVIDAD RECIENTE
+        =================================================== -->
+
+        <section class="dashboard-seccion">
+
+            <div class="dashboard-titulo">
+
+                <div>
+
+                    <span>
+                        Actividad
+                    </span>
+
+                    <h2>
+                        Actividad reciente
+                    </h2>
+
+                    <p>
+                        Consulta los últimos movimientos realizados
+                        en CeroHambre.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!--
+                App.js cargará aquí las actividades reales.
+            -->
+
+            <div id="actividadReciente">
+
+                <div class="actividad-card">
+
+                    <div class="actividad-vacia">
+
+                        <div class="actividad-icono">
+                            🕘
+                        </div>
+
+                        <h3>
+                            Cargando actividad...
+                        </h3>
+
+                        <p>
+                            Estamos consultando tus últimos movimientos.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             IMPACTO
+        =================================================== -->
+
+        <section class="dashboard-impacto">
+
+            <div>
+
+                <span>
+                    Impacto de CeroHambre
+                </span>
+
+                <h2>
+                    Cada alimento puede hacer la diferencia.
+                </h2>
+
+                <p>
+                    Tu participación ayuda a aprovechar alimentos
+                    que podrían desperdiciarse y llevarlos a
+                    organizaciones que los necesitan.
+                </p>
+
+            </div>
+
+
+            <div class="impacto-numero">
+
+                <strong id="impactoKg">
+                    0
+                </strong>
+
+                <span>
+                    kg recuperados
+                </span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- ==================================================
+         FOOTER
+    =================================================== -->
+
+    <footer>
+
+        <div>
+
+            <strong>
+                CeroHambre
+            </strong>
+
+            <p>
+                Una iniciativa tecnológica para contribuir
+                al ODS 2 – Hambre Cero.
+            </p>
+
+        </div>
+
+
+        <div>
+
+            <p>
+                © 2026 CeroHambre
+            </p>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- ==================================================
+         JAVASCRIPT
+    =================================================== -->
+
+    <script src="Js/App.js"></script>
+
+</body>
+
+</html>

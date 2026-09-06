@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CeroHambre | ODS 2</title>
+
+    <link rel="stylesheet" href="Css/Styles.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            CeroHambre
+        </div>
+
+        <nav>
+            <a href="#inicio">Inicio</a>
+            <a href="#como-funciona">Cómo funciona</a>
+            <a href="#impacto">Nuestro impacto</a>
+            <a href="#contacto">Contacto</a>
+        </nav>
+
+        <div class="acciones">
+            <button onclick="mostrarLogin()">Iniciar sesión</button>
+            <button class="btn-principal" onclick="mostrarRegistro()">
+                Registrarse
+            </button>
+        </div>
+    </header>
+
+
+    <main>
+
+        <!-- INICIO -->
+        <section id="inicio" class="hero">
+
+            <div class="hero-texto">
+
+                <span class="etiqueta">
+                    ODS 2 · Hambre Cero
+                </span>
+
+                <h1>
+                    Los alimentos que sobran
+                    <span>pueden alimentar.</span>
+                </h1>
+
+                <p>
+                    CeroHambre conecta donantes de alimentos con
+                    organizaciones que los necesitan, ayudando a
+                    reducir el desperdicio y combatir el hambre.
+                </p>
+
+                <div class="hero-botones">
+                    <button class="btn-principal" onclick="mostrarRegistro()">
+                        Quiero ayudar
+                    </button>
+
+                    <button class="btn-secundario" onclick="irComoFunciona()">
+                        Conocer más
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="hero-ilustracion">
+                <div class="circulo">
+                    
+                </div>
+
+                <div class="tarjeta-flotante">
+                    <strong>Alimentos recuperados</strong>
+                    <span>0 kg</span>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- COMO FUNCIONA -->
+        <section id="como-funciona" class="seccion">
+
+            <div class="titulo-seccion">
+                <span>¿Cómo funciona?</span>
+
+                <h2>
+                    Juntos podemos hacer la diferencia
+                </h2>
+
+                <p>
+                    Una plataforma sencilla para conectar alimentos
+                    disponibles con quienes más los necesitan.
+                </p>
+            </div>
+
+
+            <div class="pasos">
+
+                <div class="paso">
+                    <div class="numero">1</div>
+
+                    <h3>Registra tu cuenta</h3>
+
+                    <p>
+                        Crea una cuenta como donante u organización
+                        beneficiaria.
+                    </p>
+                </div>
+
+
+                <div class="paso">
+                    <div class="numero">2</div>
+
+                    <h3>Publica o encuentra alimentos</h3>
+
+                    <p>
+                        Los donantes publican sus alimentos disponibles
+                        y las organizaciones pueden consultarlos.
+                    </p>
+                </div>
+
+
+                <div class="paso">
+                    <div class="numero">3</div>
+
+                    <h3>Solicita una donación</h3>
+
+                    <p>
+                        Las organizaciones solicitan los alimentos
+                        que necesitan.
+                    </p>
+                </div>
+
+
+                <div class="paso">
+                    <div class="numero">4</div>
+
+                    <h3>Entrega y ayuda</h3>
+
+                    <p>
+                        Se registra la entrega y se mide el impacto
+                        generado.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- IMPACTO -->
+        <section id="impacto" class="impacto">
+
+            <div class="titulo-seccion">
+                <span>Nuestro impacto</span>
+
+                <h2>
+                    Cada donación cuenta
+                </h2>
+            </div>
+
+
+            <div class="estadisticas">
+
+                <div class="estadistica">
+                    <strong>0</strong>
+                    <span>Kg recuperados</span>
+                </div>
+
+                <div class="estadistica">
+                    <strong>0</strong>
+                    <span>Personas beneficiadas</span>
+                </div>
+
+                <div class="estadistica">
+                    <strong>0</strong>
+                    <span>Organizaciones</span>
+                </div>
+
+                <div class="estadistica">
+                    <strong>0</strong>
+                    <span>Entregas realizadas</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- LLAMADO A LA ACCIÓN -->
+        <section class="llamada">
+
+            <h2>
+                ¿Quieres ser parte del cambio?
+            </h2>
+
+            <p>
+                Dona alimentos, encuentra ayuda y construyamos
+                juntos una sociedad con menos desperdicio y hambre.
+            </p>
+
+            <button class="btn-principal" onclick="mostrarRegistro()">
+                Crear una cuenta
+            </button>
+
+        </section>
+
+    </main>
+
+
+    <footer id="contacto">
+
+        <div>
+            <strong>CeroHambre</strong>
+
+            <p>
+                Una iniciativa tecnológica para contribuir
+                al ODS 2 – Hambre Cero.
+            </p>
+        </div>
+
+        <div>
+            <p>© 2026 CeroHambre</p>
+        </div>
+
+    </footer>
+
+
+    <script src="Js/App.js"></script>
+
+</body>
+</html>

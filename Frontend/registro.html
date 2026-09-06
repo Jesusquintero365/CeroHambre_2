@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CeroHambre | Crear cuenta</title>
+
+    <link rel="stylesheet" href="Css/Styles.css">
+</head>
+
+<body>
+
+    <main class="login-container">
+
+        <section class="login-card">
+
+            <div class="login-logo">
+                CeroHambre
+            </div>
+
+            <h1>Crear cuenta</h1>
+
+            <p class="login-descripcion">
+                Únete a CeroHambre y ayuda a combatir el desperdicio
+                de alimentos.
+            </p>
+
+
+            <form id="registroForm">
+
+                <!-- NOMBRE -->
+                <div class="campo">
+
+                    <label for="nombre">
+                        Nombre *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Tu nombre"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CORREO -->
+                <div class="campo">
+
+                    <label for="correoRegistro">
+                        Correo electrónico *
+                    </label>
+
+                    <input
+                        type="email"
+                        id="correoRegistro"
+                        name="correo"
+                        placeholder="ejemplo@correo.com"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- CONTRASEÑA -->
+                <div class="campo">
+
+                    <label for="passwordRegistro">
+                        Contraseña *
+                    </label>
+
+                    <input
+                        type="password"
+                        id="passwordRegistro"
+                        name="password"
+                        placeholder="Crea una contraseña"
+                        required
+                        minlength="6"
+                    >
+
+                </div>
+
+
+                <!-- TIPO DE USUARIO -->
+                <div class="campo">
+
+                    <label for="tipo_usuario">
+                        Tipo de usuario 
+                    </label>
+
+                    <select
+                        id="tipo_usuario"
+                        name="tipo_usuario"
+                        required
+                    >
+
+                        <option value="">
+                            Selecciona una opción
+                        </option>
+
+                        <option value="donante">
+                            Donante
+                        </option>
+
+                        <option value="organizacion">
+                            Organización
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- UBICACIÓN -->
+                <div class="campo">
+
+                    <label for="ubicacion">
+                        Ubicación 
+                    </label>
+
+                    <input
+                        type="text"
+                        id="ubicacion"
+                        name="ubicacion"
+                        placeholder="Ciudad o municipio"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- BOTÓN -->
+                <button
+                    type="submit"
+                    class="btn-login"
+                >
+                    Crear cuenta
+                </button>
+
+            </form>
+
+
+            <!-- MENSAJE -->
+            <div id="mensajeRegistro"></div>
+
+
+            <!-- LOGIN -->
+            <p class="registro-texto">
+
+                ¿Ya tienes una cuenta?
+
+                <a href="login.html">
+                    Iniciar sesión
+                </a>
+
+            </p>
+
+
+            <!-- VOLVER -->
+            <a
+                href="index.html"
+                class="volver"
+            >
+                Volver al inicio
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <script src="Js/App.js"></script>
+
+</body>
+
+</html>

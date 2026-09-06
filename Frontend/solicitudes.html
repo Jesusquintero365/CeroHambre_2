@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CeroHambre | Solicitudes</title>
+
+    <link rel="stylesheet" href="Css/Styles.css">
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">CeroHambre</div>
+
+    <nav>
+        <a href="dashboard.html">Inicio</a>
+        <a href="donaciones.html">Donaciones</a>
+        <a href="solicitudes.html">Solicitudes</a>
+        <a href="reportes.html">Reportes</a>
+        <a href="entregas.html">Entregas</a>
+    </nav>
+
+    <div class="acciones">
+        <span id="nombreUsuario">Usuario</span>
+        <button onclick="cerrarSesion()">
+            Cerrar sesión
+        </button>
+    </div>
+
+</header>
+
+
+<main class="dashboard">
+
+    <section class="dashboard-bienvenida">
+
+        <div>
+
+            <span class="etiqueta">
+                Gestión de solicitudes
+            </span>
+
+            <h1>Solicitudes</h1>
+
+            <p>
+                Consulta las solicitudes de alimentos
+                realizadas en CeroHambre.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <section class="dashboard-seccion">
+
+        <div class="dashboard-titulo">
+
+            <span>Solicitudes</span>
+
+            <h2>Solicitudes registradas</h2>
+
+        </div>
+
+
+        <div id="listaSolicitudes">
+
+            <div class="actividad-card">
+
+                <div class="actividad-vacia">
+
+                    <div class="actividad-icono">
+                        📋
+                    </div>
+
+                    <h3>
+                        Cargando solicitudes...
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <div>
+
+        <strong>CeroHambre</strong>
+
+        <p>
+            Una iniciativa tecnológica para contribuir
+            al ODS 2 – Hambre Cero.
+        </p>
+
+    </div>
+
+    <div>
+
+        <p>
+            © 2026 CeroHambre
+        </p>
+
+    </div>
+
+</footer>
+
+
+<script src="Js/App.js"></script>
+
+</body>
+</html>
