@@ -1985,3 +1985,174 @@ footer p {
         font-size: 37px;
     }
 }
+
+/* ======================================================
+   REPORTES: tablas de detalle
+====================================================== */
+
+.reportes-detalle {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.reportes-detalle h3 {
+    margin: 0 0 12px;
+}
+
+.tabla-reporte {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+}
+
+.tabla-reporte th,
+.tabla-reporte td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--borde);
+}
+
+.tabla-reporte th {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--texto-secundario);
+}
+
+.reportes-detalle small {
+    color: var(--texto-secundario);
+}
+
+
+/* =========================================================
+   MODALES (confirmaciones, mensajes y solicitud de cantidad)
+   ========================================================= */
+
+#modalCeroHambre .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(23, 35, 27, 0.55);
+    backdrop-filter: blur(2px);
+    animation: modalAparece 0.18s ease-out;
+}
+
+#modalCeroHambre .modal-card {
+    width: 100%;
+    max-width: 440px;
+    padding: 32px 30px 26px;
+    text-align: center;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: 0 24px 60px rgba(24, 55, 35, 0.28);
+}
+
+#modalCeroHambre .modal-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    font-size: 30px;
+    background: var(--verde-claro);
+    border-radius: 18px;
+}
+
+#modalCeroHambre .modal-card h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: var(--texto);
+}
+
+#modalCeroHambre .modal-card p {
+    margin: 0 0 20px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--texto-secundario);
+}
+
+#modalCeroHambre .modal-campo {
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+#modalCeroHambre .modal-campo label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--texto);
+}
+
+#modalCeroHambre .modal-campo input {
+    width: 100%;
+    padding: 12px 14px;
+    font: inherit;
+    color: var(--texto);
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+}
+
+#modalCeroHambre .modal-campo input:focus {
+    outline: 2px solid var(--verde);
+    outline-offset: 1px;
+}
+
+#modalCeroHambre .modal-error {
+    min-height: 20px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    text-align: left;
+    color: var(--rojo);
+}
+
+#modalCeroHambre .modal-botones {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+#modalCeroHambre .modal-botones button {
+    flex: 1;
+    padding: 12px 18px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+#modalCeroHambre .modal-cancelar {
+    color: var(--texto-secundario);
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+}
+
+#modalCeroHambre .modal-cancelar:hover {
+    background: var(--verde-suave);
+}
+
+#modalCeroHambre .modal-confirmar {
+    color: var(--blanco);
+    background: var(--verde);
+    border: 1px solid var(--verde);
+}
+
+#modalCeroHambre .modal-confirmar:hover {
+    background: var(--verde-oscuro);
+    transform: translateY(-1px);
+}
+
+@keyframes modalAparece {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}

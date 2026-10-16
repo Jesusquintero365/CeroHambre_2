@@ -1,20 +1,47 @@
-const mysql = require('mysql2');
+// ======================================================
+// CONEXIÓN CON POSTGRESQL (pool de conexiones)
+// ======================================================
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'ODS_2',
-    port: 3306
+const { Pool } = require('pg');
+const config = require('./env');
+
+const pool = new Pool({
+    connectionString: config.databaseUrl,
+    ssl: config.databaseSsl ? { rejectUnauthorized: false } : false,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000
 });
 
-connection.connect((error) => {
-    if (error) {
-        console.error('❌ Error al conectar con la base de datos:', error.message);
-        return;
+// Evita que un error de una conexión inactiva tumbe el servidor
+pool.on('error', (error) => {
+    console.error('❌ Error inesperado en el pool de PostgreSQL:', error.message);
+});
+
+// Ejecuta una consulta parametrizada
+function query(texto, parametros) {
+    return pool.query(texto, parametros);
+}
+
+// Ejecuta varias consultas como una sola transacción (todo o nada)
+async function transaccion(trabajo) {
+    const cliente = await pool.connect();
+
+    try {
+        await cliente.query('BEGIN');
+        const resultado = await trabajo(cliente);
+        await cliente.query('COMMIT');
+        return resultado;
+    } catch (error) {
+        try {
+            await cliente.query('ROLLBACK');
+        } catch (errorRollback) {
+            console.error('Error al revertir la transacción:', errorRollback.message);
+        }
+        throw error;
+    } finally {
+        cliente.release();
     }
+}
 
-    console.log(' Conexión exitosa con la base de datos ODS_2');
-});
-
-module.exports = connection;
+module.exports = { pool, query, transaccion };

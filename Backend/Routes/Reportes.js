@@ -2,11 +2,9 @@ const express = require('express');
 
 const router = express.Router();
 
-const {
-    obtenerReportes
-} = require('../controllers/reportesController');
+const { obtenerReportes } = require('../controllers/reportesController');
 
-// Obtener reportes e indicadores
+// Indicadores de impacto (público)
 router.get('/', obtenerReportes);
 
 module.exports = router;

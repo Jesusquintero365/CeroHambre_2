@@ -1,407 +1,166 @@
+// ======================================================
+// DONACIONES
+// ======================================================
+
 const db = require('../Config/database');
+const config = require('../Config/env');
+const v = require('../utils/validaciones');
 
+const { ErrorApi } = v;
 
-// ======================================================
-// CREAR UNA DONACIÓN
-// ======================================================
+// Una donación "disponible" cuya fecha de vencimiento ya pasó
+// se muestra como "vencido" (no se puede solicitar).
+const SELECT_DONACION = `
+    SELECT
+        d.id,
+        d.usuario_id,
+        d.alimento,
+        d.cantidad::float8 AS cantidad,
+        d.unidad,
+        to_char(d.fecha_vencimiento, 'YYYY-MM-DD') AS fecha_vencimiento,
+        d.ubicacion,
+        CASE
+            WHEN d.estado = 'disponible'
+             AND d.fecha_vencimiento < (NOW() AT TIME ZONE $1)::date
+            THEN 'vencido'
+            ELSE d.estado
+        END AS estado,
+        d.descripcion,
+        d.fecha_publicacion,
+        u.nombre AS donante
+    FROM donaciones d
+    INNER JOIN usuarios u ON d.usuario_id = u.id
+`;
 
-const crearDonacion = (req, res) => {
+// Valida y limpia los datos de una donación
+function leerDatosDonacion(cuerpo = {}) {
+    return {
+        alimento: v.texto(cuerpo.alimento, 'alimento', { min: 2, max: 120 }),
+        cantidad: v.numeroPositivo(cuerpo.cantidad, 'cantidad'),
+        unidad: v.opcion(cuerpo.unidad, 'unidad', v.UNIDADES),
+        fecha_vencimiento: v.fecha(cuerpo.fecha_vencimiento, 'fecha_vencimiento', { noPasada: true }),
+        ubicacion: v.texto(cuerpo.ubicacion, 'ubicacion', { min: 2, max: 150 }),
+        descripcion: v.texto(cuerpo.descripcion, 'descripcion', { max: 500, obligatorio: false })
+    };
+}
 
-    const {
-        usuario_id,
-        alimento,
-        cantidad,
-        unidad,
-        fecha_vencimiento,
-        ubicacion,
-        descripcion
-    } = req.body;
+// ------------------------------------------------------
+// Crear una donación (solo donantes)
+// ------------------------------------------------------
+const crearDonacion = async (req, res) => {
+    const d = leerDatosDonacion(req.body);
 
+    const { rows } = await db.query(
+        `INSERT INTO donaciones
+            (usuario_id, alimento, cantidad, unidad, fecha_vencimiento, ubicacion, descripcion)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING id`,
+        [req.usuario.id, d.alimento, d.cantidad, d.unidad, d.fecha_vencimiento, d.ubicacion, d.descripcion]
+    );
 
-    // ------------------------------------------
-    // Validar datos obligatorios
-    // ------------------------------------------
+    res.status(201).json({
+        mensaje: 'Donación publicada correctamente',
+        id: rows[0].id
+    });
+};
 
-    if (
-        !usuario_id ||
-        !alimento ||
-        !cantidad ||
-        !unidad ||
-        !fecha_vencimiento ||
-        !ubicacion
-    ) {
+// ------------------------------------------------------
+// Listar donaciones
+// ------------------------------------------------------
+const obtenerDonaciones = async (req, res) => {
+    const { rows } = await db.query(
+        `${SELECT_DONACION}
+         ORDER BY d.fecha_publicacion DESC, d.id DESC`,
+        [config.zonaHoraria]
+    );
 
-        return res.status(400).json({
-            mensaje: 'Faltan datos obligatorios'
-        });
+    res.json(rows);
+};
+
+// ------------------------------------------------------
+// Obtener una donación por ID
+// ------------------------------------------------------
+const obtenerDonacionPorId = async (req, res) => {
+    const id = v.idEntero(req.params.id);
+
+    const { rows } = await db.query(
+        `${SELECT_DONACION} WHERE d.id = $2`,
+        [config.zonaHoraria, id]
+    );
+
+    if (rows.length === 0) {
+        throw new ErrorApi(404, 'Donación no encontrada');
     }
 
-
-    // ------------------------------------------
-    // Insertar donación
-    // ------------------------------------------
-
-    const sql = `
-        INSERT INTO donaciones
-        (
-            usuario_id,
-            alimento,
-            cantidad,
-            unidad,
-            fecha_vencimiento,
-            ubicacion,
-            descripcion
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    `;
-
-
-    db.query(
-        sql,
-        [
-            usuario_id,
-            alimento,
-            cantidad,
-            unidad,
-            fecha_vencimiento,
-            ubicacion,
-            descripcion || null
-        ],
-
-        (error, resultado) => {
-
-            if (error) {
-
-                console.error(error);
-
-                return res.status(500).json({
-                    mensaje: 'Error al crear la donación'
-                });
-            }
-
-
-            res.status(201).json({
-
-                mensaje:
-                    'Donación publicada correctamente',
-
-                id:
-                    resultado.insertId
-
-            });
-
-        }
-    );
+    res.json(rows[0]);
 };
 
+// Carga una donación y comprueba que pertenezca al usuario autenticado
+async function cargarDonacionPropia(req) {
+    const id = v.idEntero(req.params.id);
 
-
-// ======================================================
-// OBTENER TODAS LAS DONACIONES
-// ======================================================
-
-const obtenerDonaciones = (req, res) => {
-
-    const sql = `
-        SELECT
-
-            d.id,
-
-            d.usuario_id,
-
-            d.alimento,
-
-            d.cantidad,
-
-            d.unidad,
-
-            d.fecha_vencimiento,
-
-            d.ubicacion,
-
-            d.estado,
-
-            d.descripcion,
-
-            d.fecha_publicacion,
-
-            u.nombre AS donante
-
-        FROM donaciones d
-
-        INNER JOIN usuarios u
-            ON d.usuario_id = u.id
-
-        ORDER BY
-            d.fecha_publicacion DESC
-    `;
-
-
-    db.query(
-        sql,
-
-        (error, resultados) => {
-
-            if (error) {
-
-                console.error(error);
-
-                return res.status(500).json({
-                    mensaje:
-                        'Error al consultar las donaciones'
-                });
-            }
-
-
-            res.json(resultados);
-        }
+    const { rows } = await db.query(
+        'SELECT id, usuario_id, estado FROM donaciones WHERE id = $1',
+        [id]
     );
+
+    if (rows.length === 0) {
+        throw new ErrorApi(404, 'Donación no encontrada');
+    }
+
+    if (Number(rows[0].usuario_id) !== Number(req.usuario.id)) {
+        throw new ErrorApi(403, 'Solo el donante que la publicó puede modificar esta donación');
+    }
+
+    return rows[0];
+}
+
+// ------------------------------------------------------
+// Actualizar una donación (solo mientras esté disponible)
+// ------------------------------------------------------
+const actualizarDonacion = async (req, res) => {
+    const donacion = await cargarDonacionPropia(req);
+
+    if (donacion.estado !== 'disponible') {
+        throw new ErrorApi(409, 'Solo se pueden editar donaciones disponibles');
+    }
+
+    const d = leerDatosDonacion(req.body);
+
+    await db.query(
+        `UPDATE donaciones
+         SET alimento = $1, cantidad = $2, unidad = $3, fecha_vencimiento = $4,
+             ubicacion = $5, descripcion = $6
+         WHERE id = $7`,
+        [d.alimento, d.cantidad, d.unidad, d.fecha_vencimiento, d.ubicacion, d.descripcion, donacion.id]
+    );
+
+    res.json({ mensaje: 'Donación actualizada correctamente' });
 };
 
+// ------------------------------------------------------
+// Eliminar una donación (solo si no tiene solicitudes)
+// ------------------------------------------------------
+const eliminarDonacion = async (req, res) => {
+    const donacion = await cargarDonacionPropia(req);
 
-
-// ======================================================
-// OBTENER UNA DONACIÓN POR ID
-// ======================================================
-
-const obtenerDonacionPorId = (req, res) => {
-
-    const {
-        id
-    } = req.params;
-
-
-    const sql = `
-        SELECT
-
-            d.id,
-
-            d.usuario_id,
-
-            d.alimento,
-
-            d.cantidad,
-
-            d.unidad,
-
-            d.fecha_vencimiento,
-
-            d.ubicacion,
-
-            d.estado,
-
-            d.descripcion,
-
-            d.fecha_publicacion,
-
-            u.nombre AS donante
-
-        FROM donaciones d
-
-        INNER JOIN usuarios u
-            ON d.usuario_id = u.id
-
-        WHERE d.id = ?
-    `;
-
-
-    db.query(
-        sql,
-        [id],
-
-        (error, resultados) => {
-
-            if (error) {
-
-                console.error(error);
-
-                return res.status(500).json({
-                    mensaje:
-                        'Error al consultar la donación'
-                });
-            }
-
-
-            if (
-                resultados.length === 0
-            ) {
-
-                return res.status(404).json({
-                    mensaje:
-                        'Donación no encontrada'
-                });
-            }
-
-
-            res.json(
-                resultados[0]
-            );
+    try {
+        await db.query('DELETE FROM donaciones WHERE id = $1', [donacion.id]);
+    } catch (error) {
+        if (error.code === '23503') {
+            throw new ErrorApi(409, 'No se puede eliminar: la donación ya tiene solicitudes asociadas');
         }
-    );
+
+        throw error;
+    }
+
+    res.json({ mensaje: 'Donación eliminada correctamente' });
 };
-
-
-
-// ======================================================
-// ACTUALIZAR UNA DONACIÓN
-// ======================================================
-
-const actualizarDonacion = (req, res) => {
-
-    const {
-        id
-    } = req.params;
-
-
-    const {
-        alimento,
-        cantidad,
-        unidad,
-        fecha_vencimiento,
-        ubicacion,
-        estado,
-        descripcion
-    } = req.body;
-
-
-    const sql = `
-        UPDATE donaciones
-
-        SET
-
-            alimento = ?,
-
-            cantidad = ?,
-
-            unidad = ?,
-
-            fecha_vencimiento = ?,
-
-            ubicacion = ?,
-
-            estado = ?,
-
-            descripcion = ?
-
-        WHERE id = ?
-    `;
-
-
-    db.query(
-        sql,
-
-        [
-            alimento,
-            cantidad,
-            unidad,
-            fecha_vencimiento,
-            ubicacion,
-            estado,
-            descripcion || null,
-            id
-        ],
-
-        (error, resultado) => {
-
-            if (error) {
-
-                console.error(error);
-
-                return res.status(500).json({
-                    mensaje:
-                        'Error al actualizar la donación'
-                });
-            }
-
-
-            if (
-                resultado.affectedRows === 0
-            ) {
-
-                return res.status(404).json({
-                    mensaje:
-                        'Donación no encontrada'
-                });
-            }
-
-
-            res.json({
-                mensaje:
-                    'Donación actualizada correctamente'
-            });
-        }
-    );
-};
-
-
-
-// ======================================================
-// ELIMINAR UNA DONACIÓN
-// ======================================================
-
-const eliminarDonacion = (req, res) => {
-
-    const {
-        id
-    } = req.params;
-
-
-    const sql =
-        'DELETE FROM donaciones WHERE id = ?';
-
-
-    db.query(
-        sql,
-        [id],
-
-        (error, resultado) => {
-
-            if (error) {
-
-                console.error(error);
-
-                return res.status(500).json({
-                    mensaje:
-                        'Error al eliminar la donación'
-                });
-            }
-
-
-            if (
-                resultado.affectedRows === 0
-            ) {
-
-                return res.status(404).json({
-                    mensaje:
-                        'Donación no encontrada'
-                });
-            }
-
-
-            res.json({
-                mensaje:
-                    'Donación eliminada correctamente'
-            });
-        }
-    );
-};
-
-
-
-// ======================================================
-// EXPORTAR FUNCIONES
-// ======================================================
 
 module.exports = {
-
     crearDonacion,
-
     obtenerDonaciones,
-
     obtenerDonacionPorId,
-
     actualizarDonacion,
-
     eliminarDonacion
-
 };

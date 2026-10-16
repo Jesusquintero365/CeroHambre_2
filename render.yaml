@@ -1,0 +1,29 @@
+# Blueprint de Render: crea la base de datos PostgreSQL y el servicio web
+# conectados entre sí. Uso: Render → New + → Blueprint → elegir este repositorio.
+databases:
+  - name: cerohambre-db
+    databaseName: cerohambre
+    user: cerohambre
+    plan: free
+
+services:
+  - type: web
+    name: cerohambre
+    runtime: node
+    plan: free
+    buildCommand: npm install --prefix Backend
+    startCommand: node Backend/Server.js
+    healthCheckPath: /api/salud
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL            # la URL interna de la BD la inyecta Render
+        fromDatabase:
+          name: cerohambre-db
+          property: connectionString
+      - key: JWT_SECRET              # Render genera un valor aleatorio
+        generateValue: true
+      - key: ZONA_HORARIA
+        value: America/Bogota
+      - key: CARGAR_DATOS_EJEMPLO
+        value: "true"

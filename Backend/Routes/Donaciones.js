@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
+const { autenticar, permitirRoles } = require('../middleware/auth');
+
 const {
     crearDonacion,
     obtenerDonaciones,
@@ -10,19 +12,13 @@ const {
     eliminarDonacion
 } = require('../controllers/donacionesController');
 
-// Crear una donación
-router.post('/', crearDonacion);
-
-// Obtener todas las donaciones
+// Consultar donaciones (público)
 router.get('/', obtenerDonaciones);
-
-// Obtener una donación por ID
 router.get('/:id', obtenerDonacionPorId);
 
-// Actualizar una donación
-router.put('/:id', actualizarDonacion);
-
-// Eliminar una donación
-router.delete('/:id', eliminarDonacion);
+// Publicar, editar y eliminar donaciones (solo donantes)
+router.post('/', autenticar, permitirRoles('donante'), crearDonacion);
+router.put('/:id', autenticar, permitirRoles('donante'), actualizarDonacion);
+router.delete('/:id', autenticar, permitirRoles('donante'), eliminarDonacion);
 
 module.exports = router;

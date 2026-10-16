@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="822" viewBox="0 0 1100 822" font-family="Arial, Helvetica, sans-serif">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="550.0" y="38" text-anchor="middle" font-size="24" font-weight="bold" fill="#17231b">CeroHambre – Diagrama entidad-relación (PostgreSQL)</text>
+<rect x="170" y="520" width="330" height="252" fill="#fff" stroke="#444" stroke-width="1.5"/>
+<rect x="170" y="520" width="330" height="42" fill="#2f7d46"/>
+<text x="335.0" y="548" text-anchor="middle" font-size="20" font-weight="bold" fill="#fff">usuarios</text>
+<text x="182" y="582.0" font-size="14" font-weight="bold" fill="#111">id</text>
+<text x="345" y="582.0" font-size="13" fill="#555">INTEGER</text>
+<text x="490" y="582.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">PK</text>
+<line x1="170" y1="592.0" x2="500" y2="592.0" stroke="#e5e7eb"/>
+<text x="182" y="612.0" font-size="14" font-weight="bold" fill="#111">nombre</text>
+<text x="345" y="612.0" font-size="13" fill="#555">VARCHAR(100)</text>
+<line x1="170" y1="622.0" x2="500" y2="622.0" stroke="#e5e7eb"/>
+<text x="182" y="642.0" font-size="14" font-weight="bold" fill="#111">correo</text>
+<text x="345" y="642.0" font-size="13" fill="#555">VARCHAR(150)</text>
+<text x="490" y="642.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">UK</text>
+<line x1="170" y1="652.0" x2="500" y2="652.0" stroke="#e5e7eb"/>
+<text x="182" y="672.0" font-size="14" font-weight="bold" fill="#111">password_hash</text>
+<text x="345" y="672.0" font-size="13" fill="#555">VARCHAR(255)</text>
+<line x1="170" y1="682.0" x2="500" y2="682.0" stroke="#e5e7eb"/>
+<text x="182" y="702.0" font-size="14" font-weight="bold" fill="#111">tipo_usuario</text>
+<text x="345" y="702.0" font-size="13" fill="#555">VARCHAR(20)</text>
+<line x1="170" y1="712.0" x2="500" y2="712.0" stroke="#e5e7eb"/>
+<text x="182" y="732.0" font-size="14" font-weight="bold" fill="#111">ubicacion</text>
+<text x="345" y="732.0" font-size="13" fill="#555">VARCHAR(150)</text>
+<line x1="170" y1="742.0" x2="500" y2="742.0" stroke="#e5e7eb"/>
+<text x="182" y="762.0" font-size="14" font-weight="bold" fill="#111">fecha_registro</text>
+<text x="345" y="762.0" font-size="13" fill="#555">TIMESTAMPTZ</text>
+<rect x="170" y="70" width="330" height="342" fill="#fff" stroke="#444" stroke-width="1.5"/>
+<rect x="170" y="70" width="330" height="42" fill="#1f6f8b"/>
+<text x="335.0" y="98" text-anchor="middle" font-size="20" font-weight="bold" fill="#fff">donaciones</text>
+<text x="182" y="132.0" font-size="14" font-weight="bold" fill="#111">id</text>
+<text x="345" y="132.0" font-size="13" fill="#555">INTEGER</text>
+<text x="490" y="132.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">PK</text>
+<line x1="170" y1="142.0" x2="500" y2="142.0" stroke="#e5e7eb"/>
+<text x="182" y="162.0" font-size="14" font-weight="bold" fill="#111">usuario_id</text>
+<text x="345" y="162.0" font-size="13" fill="#555">INTEGER</text>
+<text x="490" y="162.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">FK</text>
+<line x1="170" y1="172.0" x2="500" y2="172.0" stroke="#e5e7eb"/>
+<text x="182" y="192.0" font-size="14" font-weight="bold" fill="#111">alimento</text>
+<text x="345" y="192.0" font-size="13" fill="#555">VARCHAR(120)</text>
+<line x1="170" y1="202.0" x2="500" y2="202.0" stroke="#e5e7eb"/>
+<text x="182" y="222.0" font-size="14" font-weight="bold" fill="#111">cantidad</text>
+<text x="345" y="222.0" font-size="13" fill="#555">NUMERIC(10,2)</text>
+<line x1="170" y1="232.0" x2="500" y2="232.0" stroke="#e5e7eb"/>
+<text x="182" y="252.0" font-size="14" font-weight="bold" fill="#111">unidad</text>
+<text x="345" y="252.0" font-size="13" fill="#555">VARCHAR(20)</text>
+<line x1="170" y1="262.0" x2="500" y2="262.0" stroke="#e5e7eb"/>
+<text x="182" y="282.0" font-size="14" font-weight="bold" fill="#111">fecha_vencimiento</text>
+<text x="345" y="282.0" font-size="13" fill="#555">DATE</text>
+<line x1="170" y1="292.0" x2="500" y2="292.0" stroke="#e5e7eb"/>
+<text x="182" y="312.0" font-size="14" font-weight="bold" fill="#111">ubicacion</text>
+<text x="345" y="312.0" font-size="13" fill="#555">VARCHAR(150)</text>
+<line x1="170" y1="322.0" x2="500" y2="322.0" stroke="#e5e7eb"/>
+<text x="182" y="342.0" font-size="14" font-weight="bold" fill="#111">descripcion</text>
+<text x="345" y="342.0" font-size="13" fill="#555">TEXT · null</text>
+<line x1="170" y1="352.0" x2="500" y2="352.0" stroke="#e5e7eb"/>
+<text x="182" y="372.0" font-size="14" font-weight="bold" fill="#111">estado</text>
+<text x="345" y="372.0" font-size="13" fill="#555">VARCHAR(20)</text>
+<line x1="170" y1="382.0" x2="500" y2="382.0" stroke="#e5e7eb"/>
+<text x="182" y="402.0" font-size="14" font-weight="bold" fill="#111">fecha_publicacion</text>
+<text x="345" y="402.0" font-size="13" fill="#555">TIMESTAMPTZ</text>
+<rect x="700" y="150" width="330" height="222" fill="#fff" stroke="#444" stroke-width="1.5"/>
+<rect x="700" y="150" width="330" height="42" fill="#a35d00"/>
+<text x="865.0" y="178" text-anchor="middle" font-size="20" font-weight="bold" fill="#fff">solicitudes</text>
+<text x="712" y="212.0" font-size="14" font-weight="bold" fill="#111">id</text>
+<text x="875" y="212.0" font-size="13" fill="#555">INTEGER</text>
+<text x="1020" y="212.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">PK</text>
+<line x1="700" y1="222.0" x2="1030" y2="222.0" stroke="#e5e7eb"/>
+<text x="712" y="242.0" font-size="14" font-weight="bold" fill="#111">donacion_id</text>
+<text x="875" y="242.0" font-size="13" fill="#555">INTEGER</text>
+<text x="1020" y="242.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">FK</text>
+<line x1="700" y1="252.0" x2="1030" y2="252.0" stroke="#e5e7eb"/>
+<text x="712" y="272.0" font-size="14" font-weight="bold" fill="#111">organizacion_id</text>
+<text x="875" y="272.0" font-size="13" fill="#555">INTEGER</text>
+<text x="1020" y="272.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">FK</text>
+<line x1="700" y1="282.0" x2="1030" y2="282.0" stroke="#e5e7eb"/>
+<text x="712" y="302.0" font-size="14" font-weight="bold" fill="#111">cantidad_solicitada</text>
+<text x="875" y="302.0" font-size="13" fill="#555">NUMERIC(10,2)</text>
+<line x1="700" y1="312.0" x2="1030" y2="312.0" stroke="#e5e7eb"/>
+<text x="712" y="332.0" font-size="14" font-weight="bold" fill="#111">estado</text>
+<text x="875" y="332.0" font-size="13" fill="#555">VARCHAR(20)</text>
+<line x1="700" y1="342.0" x2="1030" y2="342.0" stroke="#e5e7eb"/>
+<text x="712" y="362.0" font-size="14" font-weight="bold" fill="#111">fecha_solicitud</text>
+<text x="875" y="362.0" font-size="13" fill="#555">TIMESTAMPTZ</text>
+<rect x="700" y="560" width="330" height="192" fill="#fff" stroke="#444" stroke-width="1.5"/>
+<rect x="700" y="560" width="330" height="42" fill="#6a4c93"/>
+<text x="865.0" y="588" text-anchor="middle" font-size="20" font-weight="bold" fill="#fff">entregas</text>
+<text x="712" y="622.0" font-size="14" font-weight="bold" fill="#111">id</text>
+<text x="875" y="622.0" font-size="13" fill="#555">INTEGER</text>
+<text x="1020" y="622.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">PK</text>
+<line x1="700" y1="632.0" x2="1030" y2="632.0" stroke="#e5e7eb"/>
+<text x="712" y="652.0" font-size="14" font-weight="bold" fill="#111">solicitud_id</text>
+<text x="875" y="652.0" font-size="13" fill="#555">INTEGER</text>
+<text x="1020" y="652.0" text-anchor="end" font-size="13" font-weight="bold" fill="#b00020">FK, UK</text>
+<line x1="700" y1="662.0" x2="1030" y2="662.0" stroke="#e5e7eb"/>
+<text x="712" y="682.0" font-size="14" font-weight="bold" fill="#111">fecha_entrega</text>
+<text x="875" y="682.0" font-size="13" fill="#555">DATE · null</text>
+<line x1="700" y1="692.0" x2="1030" y2="692.0" stroke="#e5e7eb"/>
+<text x="712" y="712.0" font-size="14" font-weight="bold" fill="#111">estado</text>
+<text x="875" y="712.0" font-size="13" fill="#555">VARCHAR(20)</text>
+<line x1="700" y1="722.0" x2="1030" y2="722.0" stroke="#e5e7eb"/>
+<text x="712" y="742.0" font-size="14" font-weight="bold" fill="#111">observaciones</text>
+<text x="875" y="742.0" font-size="13" fill="#555">TEXT · null</text>
+<path d="M 500.0,577.0 L 630.0,577.0 L 630.0,267.0 L 700.0,267.0" fill="none" stroke="#222" stroke-width="2"/>
+<path d="M 170.0,577.0 L 115.0,577.0 L 115.0,157.0 L 170.0,157.0" fill="none" stroke="#222" stroke-width="2"/>
+<path d="M 500.0,127.0 L 570.0,127.0 L 570.0,237.0 L 700.0,237.0" fill="none" stroke="#222" stroke-width="2"/>
+<path d="M 865.0,372.0 L 865.0,560.0" fill="none" stroke="#222" stroke-width="2"/>
+<line x1="510.0" y1="569.0" x2="510.0" y2="585.0" stroke="#222" stroke-width="2"/>
+<line x1="517.0" y1="569.0" x2="517.0" y2="585.0" stroke="#222" stroke-width="2"/>
+<line x1="684.0" y1="267.0" x2="700.0" y2="276.0" stroke="#222" stroke-width="2"/>
+<line x1="684.0" y1="267.0" x2="700.0" y2="258.0" stroke="#222" stroke-width="2"/>
+<line x1="684.0" y1="267.0" x2="700.0" y2="267.0" stroke="#222" stroke-width="2"/>
+<circle cx="677.0" cy="267.0" r="5.5" fill="#fff" stroke="#222" stroke-width="2"/>
+<line x1="160.0" y1="585.0" x2="160.0" y2="569.0" stroke="#222" stroke-width="2"/>
+<line x1="153.0" y1="585.0" x2="153.0" y2="569.0" stroke="#222" stroke-width="2"/>
+<line x1="154.0" y1="157.0" x2="170.0" y2="166.0" stroke="#222" stroke-width="2"/>
+<line x1="154.0" y1="157.0" x2="170.0" y2="148.0" stroke="#222" stroke-width="2"/>
+<line x1="154.0" y1="157.0" x2="170.0" y2="157.0" stroke="#222" stroke-width="2"/>
+<circle cx="147.0" cy="157.0" r="5.5" fill="#fff" stroke="#222" stroke-width="2"/>
+<line x1="510.0" y1="119.0" x2="510.0" y2="135.0" stroke="#222" stroke-width="2"/>
+<line x1="517.0" y1="119.0" x2="517.0" y2="135.0" stroke="#222" stroke-width="2"/>
+<line x1="684.0" y1="237.0" x2="700.0" y2="246.0" stroke="#222" stroke-width="2"/>
+<line x1="684.0" y1="237.0" x2="700.0" y2="228.0" stroke="#222" stroke-width="2"/>
+<line x1="684.0" y1="237.0" x2="700.0" y2="237.0" stroke="#222" stroke-width="2"/>
+<circle cx="677.0" cy="237.0" r="5.5" fill="#fff" stroke="#222" stroke-width="2"/>
+<line x1="873.0" y1="382.0" x2="857.0" y2="382.0" stroke="#222" stroke-width="2"/>
+<line x1="873.0" y1="389.0" x2="857.0" y2="389.0" stroke="#222" stroke-width="2"/>
+<line x1="857.0" y1="550.0" x2="873.0" y2="550.0" stroke="#222" stroke-width="2"/>
+<circle cx="865.0" cy="541.0" r="5.5" fill="#fff" stroke="#222" stroke-width="2"/>
+<text x="620.0" y="462.0" text-anchor="end" font-size="14" font-weight="bold" fill="#17231b" paint-order="stroke" stroke="#fff" stroke-width="5">realiza</text><text x="620.0" y="479.0" text-anchor="end" font-size="13" fill="#444" paint-order="stroke" stroke="#fff" stroke-width="5">1 : N</text>
+<text x="107" y="367.0" text-anchor="end" font-size="14" font-weight="bold" fill="#17231b" paint-order="stroke" stroke="#fff" stroke-width="5">publica</text><text x="107" y="384.0" text-anchor="end" font-size="13" fill="#444" paint-order="stroke" stroke="#fff" stroke-width="5">1 : N</text>
+<text x="580.0" y="182.0" text-anchor="start" font-size="14" font-weight="bold" fill="#17231b" paint-order="stroke" stroke="#fff" stroke-width="5">recibe</text><text x="580.0" y="199.0" text-anchor="start" font-size="13" fill="#444" paint-order="stroke" stroke="#fff" stroke-width="5">1 : N</text>
+<text x="879.0" y="462.0" text-anchor="start" font-size="14" font-weight="bold" fill="#17231b" paint-order="stroke" stroke="#fff" stroke-width="5">genera</text><text x="879.0" y="479.0" text-anchor="start" font-size="13" fill="#444" paint-order="stroke" stroke="#fff" stroke-width="5">1 : 0..1</text>
+<text x="60" y="800" font-size="12" fill="#555">PK = llave primaria · FK = llave foránea · UK = valor único · || uno (obligatorio) · o&lt; cero o muchos · o| cero o uno</text>
+</svg>

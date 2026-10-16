@@ -2,7 +2,96 @@
 // CeroHambre - App.js
 // ======================================================
 
-const API = "http://localhost:3000/api";
+// En producción (Render) el frontend y la API salen del mismo servidor,
+// por eso la ruta es relativa. Si abres los HTML con Live Server o como
+// archivo, se usa el backend local en el puerto 3000.
+const API =
+    (
+        window.location.protocol === "file:" ||
+        ["5500", "5501", "5173"].includes(window.location.port)
+    )
+        ? "http://localhost:3000/api"
+        : "/api";
+
+const CLAVE_USUARIO = "usuarioCeroHambre";
+const CLAVE_TOKEN = "tokenCeroHambre";
+
+// Se activa cuando la página va a redirigir al login (evita peticiones inútiles)
+let redirigiendoALogin = false;
+
+
+// ======================================================
+// UTILIDADES
+// ======================================================
+
+// Escapa texto antes de insertarlo con innerHTML (evita inyección de HTML/JS)
+function esc(valor) {
+
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+// "2026-10-20" -> "20/10/2026"
+function formatearFecha(fecha) {
+
+    if (!fecha) {
+        return "";
+    }
+
+    const partes = String(fecha).slice(0, 10).split("-");
+
+    return partes.length === 3
+        ? `${partes[2]}/${partes[1]}/${partes[0]}`
+        : String(fecha);
+}
+
+// "en_camino" -> "En camino"
+function estadoLegible(estado) {
+
+    const texto = String(estado ?? "").replace(/_/g, " ");
+
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+// fetch que agrega el token de sesión y maneja sesiones vencidas
+async function apiFetch(url, opciones = {}) {
+
+    if (redirigiendoALogin) {
+        // La página se está cerrando: no se hace la petición
+        return new Promise(function() {});
+    }
+
+    const token = localStorage.getItem(CLAVE_TOKEN);
+
+    const cabeceras = { ...(opciones.headers || {}) };
+
+    if (token) {
+        cabeceras["Authorization"] = `Bearer ${token}`;
+    }
+
+    const respuesta = await window.fetch(url, { ...opciones, headers: cabeceras });
+
+    // Sesión vencida o inválida: se cierra y se vuelve al login
+    if (
+        respuesta.status === 401 &&
+        token &&
+        !String(url).includes("/usuarios/login")
+    ) {
+
+        localStorage.removeItem(CLAVE_USUARIO);
+        localStorage.removeItem(CLAVE_TOKEN);
+
+        redirigiendoALogin = true;
+        window.location.href = "login.html";
+    }
+
+    return respuesta;
+}
+
 
 
 // ======================================================
@@ -12,7 +101,7 @@ const API = "http://localhost:3000/api";
 function obtenerUsuario() {
 
     const usuarioGuardado =
-        localStorage.getItem("usuarioCeroHambre");
+        localStorage.getItem(CLAVE_USUARIO);
 
     if (!usuarioGuardado) {
         return null;
@@ -57,14 +146,56 @@ mostrarUsuario();
 
 
 // ======================================================
+// PÁGINAS PRIVADAS (requieren sesión iniciada)
+// ======================================================
+
+(function protegerPagina() {
+
+    const paginasPrivadas = [
+        "dashboard.html",
+        "donaciones.html",
+        "solicitudes.html",
+        "entregas.html",
+        "reportes.html",
+        "publicar-donacion.html"
+    ];
+
+    const pagina =
+        window.location.pathname.split("/").pop();
+
+    if (!paginasPrivadas.includes(pagina)) {
+        return;
+    }
+
+    const usuario =
+        obtenerUsuario();
+
+    if (!usuario || !localStorage.getItem(CLAVE_TOKEN)) {
+
+        redirigiendoALogin = true;
+        window.location.replace("login.html");
+        return;
+    }
+
+    // Solo los donantes publican donaciones
+    if (
+        pagina === "publicar-donacion.html" &&
+        usuario.tipo_usuario !== "donante"
+    ) {
+        redirigiendoALogin = true;
+        window.location.replace("donaciones.html");
+    }
+})();
+
+
+// ======================================================
 // CERRAR SESIÓN
 // ======================================================
 
 function cerrarSesion() {
 
-    localStorage.removeItem(
-        "usuarioCeroHambre"
-    );
+    localStorage.removeItem(CLAVE_USUARIO);
+    localStorage.removeItem(CLAVE_TOKEN);
 
     window.location.href =
         "login.html";
@@ -122,6 +253,25 @@ function irEntregas() {
 function irReportes() {
     window.location.href = "reportes.html";
 }
+
+// Ir al formulario para publicar una donación
+function irPublicarDonacion() {
+    window.location.href = "publicar-donacion.html";
+}
+
+// El botón "Publicar donación" solo se muestra a los donantes
+(function ocultarPublicarSiNoEsDonante() {
+
+    const boton =
+        document.getElementById("btnPublicarDonacion");
+
+    const usuario =
+        obtenerUsuario();
+
+    if (boton && (!usuario || usuario.tipo_usuario !== "donante")) {
+        boton.style.display = "none";
+    }
+})();
 
 // ======================================================
 // MODAL PROFESIONAL DE CEROHAMBRE
@@ -228,6 +378,27 @@ function mostrarModal(
         modal
     );
 
+
+    // ------------------------------------------
+    // Cierre automático / clic fuera / tecla Esc
+    // (evita que un mensaje sin botones bloquee la pantalla)
+    // ------------------------------------------
+
+    if (tipo === "exito") {
+        setTimeout(function() {
+            if (modal.isConnected) {
+                modal.remove();
+            }
+        }, 3500);
+    }
+
+    modal
+        .querySelector(".modal-overlay")
+        .addEventListener("click", function(evento) {
+            if (evento.target === evento.currentTarget) {
+                modal.remove();
+            }
+        });
 
     // ------------------------------------------
     // Botones
@@ -483,7 +654,7 @@ function mostrarModalCantidad(
 
 
                     const respuesta =
-                        await fetch(
+                        await apiFetch(
                             `${API}/solicitudes`,
                             {
                                 method: "POST",
@@ -669,7 +840,7 @@ if (loginForm) {
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API}/usuarios/login`,
                         {
                             method: "POST",
@@ -707,10 +878,15 @@ if (loginForm) {
 
 
                 localStorage.setItem(
-                    "usuarioCeroHambre",
+                    CLAVE_USUARIO,
                     JSON.stringify(
                         datos.usuario
                     )
+                );
+
+                localStorage.setItem(
+                    CLAVE_TOKEN,
+                    datos.token
                 );
 
 
@@ -818,11 +994,18 @@ if (registroForm) {
                 return;
             }
 
+            if (password.length < 8) {
+
+                mensaje.textContent =
+                    "La contraseña debe tener al menos 8 caracteres.";
+                return;
+            }
+
 
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API}/usuarios`,
                         {
                             method: "POST",
@@ -1009,7 +1192,7 @@ if (donacionForm) {
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API}/donaciones`,
                         {
                             method: "POST",
@@ -1111,7 +1294,7 @@ async function cargarDonaciones() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API}/donaciones`
             );
 
@@ -1214,7 +1397,7 @@ async function cargarDonaciones() {
                         <div class="donacion-info">
 
                             <h3>
-                                ${donacion.alimento}
+                                ${esc(donacion.alimento)}
                             </h3>
 
                             <p>
@@ -1223,7 +1406,7 @@ async function cargarDonaciones() {
                                 </strong>
 
                                 ${donacion.cantidad}
-                                ${donacion.unidad}
+                                ${esc(donacion.unidad)}
                             </p>
 
                             <p>
@@ -1231,7 +1414,7 @@ async function cargarDonaciones() {
                                     Ubicación:
                                 </strong>
 
-                                ${donacion.ubicacion}
+                                ${esc(donacion.ubicacion)}
                             </p>
 
                             <p>
@@ -1239,7 +1422,7 @@ async function cargarDonaciones() {
                                     Vencimiento:
                                 </strong>
 
-                                ${donacion.fecha_vencimiento}
+                                ${esc(formatearFecha(donacion.fecha_vencimiento))}
                             </p>
 
                             <p>
@@ -1247,7 +1430,7 @@ async function cargarDonaciones() {
                                     Donante:
                                 </strong>
 
-                                ${donacion.donante}
+                                ${esc(donacion.donante)}
                             </p>
 
                             ${
@@ -1255,7 +1438,7 @@ async function cargarDonaciones() {
                                 ? `
 
                                     <p>
-                                        ${donacion.descripcion}
+                                        ${esc(donacion.descripcion)}
                                     </p>
 
                                 `
@@ -1267,7 +1450,7 @@ async function cargarDonaciones() {
                         <div class="donacion-acciones">
 
                             <div class="donacion-estado">
-                                ${donacion.estado}
+                                ${esc(estadoLegible(donacion.estado))}
                             </div>
 
                             ${
@@ -1409,7 +1592,7 @@ async function cargarSolicitudes() {
 
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API}/solicitudes`
             );
 
@@ -1536,7 +1719,8 @@ async function cargarSolicitudes() {
 
                     else if (
                         solicitud.estado ===
-                        "aceptada"
+                        "aceptada" &&
+                        !solicitud.tiene_entrega
                     ) {
 
                         acciones = `
@@ -1578,13 +1762,19 @@ async function cargarSolicitudes() {
 
                                 #${solicitud.donacion_id}
                             </p>
+                            <p>
+                                <strong>
+                                    Alimento:
+                                </strong>
+                                ${esc(solicitud.alimento)}
+                            </p>
 
                             <p>
                                 <strong>
                                     Organización:
                                 </strong>
 
-                                ${solicitud.organizacion}
+                                ${esc(solicitud.organizacion)}
                             </p>
 
                             <p>
@@ -1593,6 +1783,7 @@ async function cargarSolicitudes() {
                                 </strong>
 
                                 ${solicitud.cantidad_solicitada}
+                                ${esc(solicitud.unidad)}
                             </p>
 
                             <p>
@@ -1600,7 +1791,7 @@ async function cargarSolicitudes() {
                                     Estado:
                                 </strong>
 
-                                ${solicitud.estado}
+                                ${esc(estadoLegible(solicitud.estado))}
                             </p>
 
                         </div>
@@ -1608,7 +1799,7 @@ async function cargarSolicitudes() {
                         <div class="donacion-acciones">
 
                             <div class="donacion-estado">
-                                ${solicitud.estado}
+                                ${esc(estadoLegible(solicitud.estado))}
                             </div>
 
                             ${acciones}
@@ -1713,7 +1904,7 @@ async function aceptarSolicitud(
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API}/solicitudes/${id}`,
                         {
                             method: "PUT",
@@ -1866,7 +2057,7 @@ async function rechazarSolicitud(
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API}/solicitudes/${id}`,
                         {
                             method: "PUT",
@@ -2023,7 +2214,7 @@ async function registrarEntrega(
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API}/entregas`,
                         {
                             method: "POST",
@@ -2132,7 +2323,7 @@ async function cargarEntregas() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API}/entregas`
             );
 
@@ -2266,6 +2457,17 @@ async function cargarEntregas() {
                 }
 
 
+                // Solo el donante cambia el estado de la entrega
+                const usuarioEntrega =
+                    obtenerUsuario();
+
+                if (
+                    !usuarioEntrega ||
+                    usuarioEntrega.tipo_usuario !== "donante"
+                ) {
+                    botones = "";
+                }
+
                 // ----------------------------------
                 // ENTREGA
                 // ----------------------------------
@@ -2297,7 +2499,7 @@ async function cargarEntregas() {
                                     Alimento:
                                 </strong>
 
-                                ${entrega.alimento}
+                                ${esc(entrega.alimento)}
                             </p>
 
                             <p>
@@ -2305,7 +2507,7 @@ async function cargarEntregas() {
                                     Organización:
                                 </strong>
 
-                                ${entrega.organizacion}
+                                ${esc(entrega.organizacion)}
                             </p>
 
                             <p>
@@ -2322,8 +2524,9 @@ async function cargarEntregas() {
                                 </strong>
 
                                 ${
-                                    entrega.fecha_entrega ||
-                                    "Pendiente"
+                                    entrega.fecha_entrega
+                                        ? esc(formatearFecha(entrega.fecha_entrega))
+                                        : "Pendiente"
                                 }
                             </p>
 
@@ -2337,7 +2540,7 @@ async function cargarEntregas() {
                                             Observaciones:
                                         </strong>
 
-                                        ${entrega.observaciones}
+                                        ${esc(entrega.observaciones)}
 
                                     </p>
 
@@ -2350,7 +2553,7 @@ async function cargarEntregas() {
                         <div class="donacion-acciones">
 
                             <div class="donacion-estado">
-                                ${entrega.estado}
+                                ${esc(estadoLegible(entrega.estado))}
                             </div>
 
                             ${botones}
@@ -2433,7 +2636,7 @@ async function actualizarEstadoEntrega(
             try {
 
                 const respuesta =
-                    await fetch(
+                    await apiFetch(
                         `${API}/entregas/${id}`,
                         {
                             method: "PUT",
@@ -2612,19 +2815,19 @@ async function cargarEstadisticasDashboard() {
             respuestaReportes
         ] = await Promise.all([
 
-            fetch(
+            apiFetch(
                 `${API}/donaciones`
             ),
 
-            fetch(
+            apiFetch(
                 `${API}/solicitudes`
             ),
 
-            fetch(
+            apiFetch(
                 `${API}/entregas`
             ),
 
-            fetch(
+            apiFetch(
                 `${API}/reportes`
             )
 
@@ -2726,7 +2929,7 @@ async function cargarReportes() {
     try {
 
         const respuesta =
-            await fetch(
+            await apiFetch(
                 `${API}/reportes`
             );
 
@@ -2872,6 +3075,75 @@ async function cargarReportes() {
 
         `;
 
+        // ----------------------------------
+        // Detalle: alimentos por unidad y donaciones por estado
+        // ----------------------------------
+
+        const porUnidad =
+            Array.isArray(datos.por_unidad)
+                ? datos.por_unidad
+                : [];
+
+        const porEstado =
+            Array.isArray(datos.donaciones_por_estado)
+                ? datos.donaciones_por_estado
+                : [];
+
+        const filasUnidad =
+            porUnidad.length
+                ? porUnidad.map(function(fila) {
+                    return `
+                        <tr>
+                            <td>${esc(estadoLegible(fila.unidad))}</td>
+                            <td>${esc(fila.total)}</td>
+                        </tr>
+                    `;
+                }).join("")
+                : `<tr><td colspan="2">Aún no hay alimentos reservados.</td></tr>`;
+
+        const filasEstado =
+            porEstado.length
+                ? porEstado.map(function(fila) {
+                    return `
+                        <tr>
+                            <td>${esc(estadoLegible(fila.estado))}</td>
+                            <td>${esc(fila.total)}</td>
+                        </tr>
+                    `;
+                }).join("")
+                : `<tr><td colspan="2">Aún no hay donaciones.</td></tr>`;
+
+        reportesContainer.innerHTML += `
+            <div class="reportes-detalle">
+                <div class="actividad-card">
+                    <h3>Alimentos recuperados por unidad</h3>
+                    <table class="tabla-reporte">
+                        <thead>
+                            <tr><th>Unidad</th><th>Total</th></tr>
+                        </thead>
+                        <tbody>${filasUnidad}</tbody>
+                    </table>
+                    <small>
+                        Los kilogramos del indicador principal suman solo kg y gramos;
+                        litros, unidades y porciones se muestran por separado.
+                    </small>
+                </div>
+                <div class="actividad-card">
+                    <h3>Donaciones por estado</h3>
+                    <table class="tabla-reporte">
+                        <thead>
+                            <tr><th>Estado</th><th>Cantidad</th></tr>
+                        </thead>
+                        <tbody>${filasEstado}</tbody>
+                    </table>
+                    <small>
+                        Donaciones publicadas: ${esc(reporte.donaciones_publicadas ?? 0)}
+                        · Donantes activos: ${esc(reporte.donantes_activos ?? 0)}
+                    </small>
+                </div>
+            </div>
+        `;
+
 
     } catch (error) {
 
@@ -2947,11 +3219,11 @@ async function cargarActividadReciente() {
             respuestaEntregas
         ] = await Promise.all([
 
-            fetch(`${API}/donaciones`),
+            apiFetch(`${API}/donaciones`),
 
-            fetch(`${API}/solicitudes`),
+            apiFetch(`${API}/solicitudes`),
 
-            fetch(`${API}/entregas`)
+            apiFetch(`${API}/entregas`)
 
         ]);
 
@@ -3204,11 +3476,11 @@ async function cargarActividadReciente() {
                     <div class="actividad-item-info">
 
                         <strong>
-                            ${actividad.titulo}
+                            ${esc(actividad.titulo)}
                         </strong>
 
                         <p>
-                            ${actividad.descripcion}
+                            ${esc(actividad.descripcion)}
                         </p>
 
                     </div>
@@ -3216,7 +3488,7 @@ async function cargarActividadReciente() {
                     <div class="actividad-item-estado">
 
                         <span class="donacion-estado">
-                            ${actividad.estado}
+                            ${esc(estadoLegible(actividad.estado))}
                         </span>
 
                     </div>
@@ -3253,3 +3525,65 @@ async function cargarActividadReciente() {
         `;
     }
 }
+
+
+// ======================================================
+// Tecla Esc cierra cualquier modal abierto
+// ======================================================
+
+document.addEventListener("keydown", function(evento) {
+    if (evento.key === "Escape") {
+        const modalAbierto =
+            document.getElementById("modalCeroHambre");
+        if (modalAbierto) {
+            modalAbierto.remove();
+        }
+    }
+});
+
+
+// ======================================================
+// INICIO: cifras de impacto reales (datos públicos)
+// ======================================================
+
+async function cargarImpactoInicio() {
+
+    const kgHero = document.getElementById("inicioKgHero");
+
+    if (!kgHero) {
+        return;
+    }
+
+    try {
+
+        const respuesta = await fetch(`${API}/reportes`);
+
+        if (!respuesta.ok) {
+            return;
+        }
+
+        const { datos } = await respuesta.json();
+
+        if (!datos) {
+            return;
+        }
+
+        const asignar = function(id, valor) {
+            const elemento = document.getElementById(id);
+            if (elemento) {
+                elemento.textContent = valor;
+            }
+        };
+
+        kgHero.textContent = `${datos.alimentos_recuperados || 0} kg`;
+        asignar("inicioKg", datos.alimentos_recuperados || 0);
+        asignar("inicioDonantes", datos.donantes_activos || 0);
+        asignar("inicioOrganizaciones", datos.organizaciones_atendidas || 0);
+        asignar("inicioEntregas", datos.entregas_realizadas || 0);
+
+    } catch (error) {
+        // Sin conexión: se dejan las cifras en 0
+    }
+}
+
+cargarImpactoInicio();

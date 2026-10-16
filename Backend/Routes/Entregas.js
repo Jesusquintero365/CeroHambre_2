@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
+const { autenticar, permitirRoles } = require('../middleware/auth');
+
 const {
     crearEntrega,
     obtenerEntregas,
@@ -10,19 +12,16 @@ const {
     eliminarEntrega
 } = require('../controllers/entregasController');
 
-// Crear una entrega
-router.post('/', crearEntrega);
+// Todas las rutas requieren sesión iniciada
+router.use(autenticar);
 
-// Obtener todas las entregas
+// Listar mis entregas / ver una entrega
 router.get('/', obtenerEntregas);
-
-// Obtener una entrega por ID
 router.get('/:id', obtenerEntregaPorId);
 
-// Actualizar una entrega
-router.put('/:id', actualizarEntrega);
-
-// Eliminar una entrega
-router.delete('/:id', eliminarEntrega);
+// Registrar, actualizar y eliminar entregas (donantes)
+router.post('/', permitirRoles('donante'), crearEntrega);
+router.put('/:id', permitirRoles('donante'), actualizarEntrega);
+router.delete('/:id', permitirRoles('donante'), eliminarEntrega);
 
 module.exports = router;

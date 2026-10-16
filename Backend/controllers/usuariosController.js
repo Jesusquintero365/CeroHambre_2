@@ -1,215 +1,220 @@
+// ======================================================
+// USUARIOS: registro, inicio de sesión y perfil
+// ======================================================
+
 const db = require('../Config/database');
+const config = require('../Config/env');
+const { hashPassword, verificarPassword } = require('../utils/password');
+const { crearToken } = require('../utils/token');
+const v = require('../utils/validaciones');
 
+const { ErrorApi } = v;
+
+// Hash de referencia para que el tiempo de respuesta no revele si el correo existe
+const HASH_FALSO = 'scrypt$16384$8$1$AAAAAAAAAAAAAAAAAAAAAA==$' + Buffer.alloc(64).toString('base64');
+
+// ------------------------------------------------------
 // Registrar usuario
-const registrarUsuario = (req, res) => {
-    const { nombre, correo, password, tipo_usuario, ubicacion } = req.body;
+// ------------------------------------------------------
+const registrarUsuario = async (req, res) => {
+    const datos = req.body || {};
 
-    if (!nombre || !correo || !password || !tipo_usuario) {
-        return res.status(400).json({
-            mensaje: 'Faltan datos obligatorios'
+    const nombre = v.texto(datos.nombre, 'nombre', { min: 2, max: 100 });
+    const correo = v.correo(datos.correo);
+    const password = v.password(datos.password);
+    const tipo_usuario = v.opcion(datos.tipo_usuario, 'tipo_usuario', v.TIPOS_USUARIO);
+    const ubicacion = v.texto(datos.ubicacion, 'ubicacion', { min: 2, max: 150 });
+
+    const passwordHash = await hashPassword(password);
+
+    try {
+        const { rows } = await db.query(
+            `INSERT INTO usuarios (nombre, correo, password_hash, tipo_usuario, ubicacion)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING id`,
+            [nombre, correo, passwordHash, tipo_usuario, ubicacion]
+        );
+
+        res.status(201).json({
+            mensaje: 'Usuario registrado correctamente',
+            id: rows[0].id
         });
+    } catch (error) {
+        if (error.code === '23505') {
+            throw new ErrorApi(409, 'El correo ya está registrado');
+        }
+
+        throw error;
     }
-
-    const sql = `
-        INSERT INTO usuarios 
-        (nombre, correo, password, tipo_usuario, ubicacion)
-        VALUES (?, ?, ?, ?, ?)
-    `;
-
-    db.query(
-        sql,
-        [nombre, correo, password, tipo_usuario, ubicacion || null],
-        (error, resultado) => {
-            if (error) {
-                console.error(error);
-
-                if (error.code === 'ER_DUP_ENTRY') {
-                    return res.status(400).json({
-                        mensaje: 'El correo ya está registrado'
-                    });
-                }
-
-                return res.status(500).json({
-                    mensaje: 'Error al registrar el usuario'
-                });
-            }
-
-            res.status(201).json({
-                mensaje: 'Usuario registrado correctamente',
-                id: resultado.insertId
-            });
-        }
-    );
 };
 
-// Obtener todos los usuarios
-const obtenerUsuarios = (req, res) => {
-    const sql = `
-        SELECT id, nombre, correo, tipo_usuario, ubicacion, fecha_registro
-        FROM usuarios
-    `;
-
-    db.query(sql, (error, resultados) => {
-        if (error) {
-            console.error(error);
-
-            return res.status(500).json({
-                mensaje: 'Error al consultar los usuarios'
-            });
-        }
-
-        res.json(resultados);
-    });
-};
-
-// Obtener un usuario por ID
-const obtenerUsuarioPorId = (req, res) => {
-    const { id } = req.params;
-
-    const sql = `
-        SELECT id, nombre, correo, tipo_usuario, ubicacion, fecha_registro
-        FROM usuarios
-        WHERE id = ?
-    `;
-
-    db.query(sql, [id], (error, resultados) => {
-        if (error) {
-            console.error(error);
-
-            return res.status(500).json({
-                mensaje: 'Error al consultar el usuario'
-            });
-        }
-
-        if (resultados.length === 0) {
-            return res.status(404).json({
-                mensaje: 'Usuario no encontrado'
-            });
-        }
-
-        res.json(resultados[0]);
-    });
-};
-
-// Actualizar usuario
-const actualizarUsuario = (req, res) => {
-    const { id } = req.params;
-    const { nombre, correo, tipo_usuario, ubicacion } = req.body;
-
-    const sql = `
-        UPDATE usuarios
-        SET nombre = ?, correo = ?, tipo_usuario = ?, ubicacion = ?
-        WHERE id = ?
-    `;
-
-    db.query(
-        sql,
-        [nombre, correo, tipo_usuario, ubicacion || null, id],
-        (error, resultado) => {
-            if (error) {
-                console.error(error);
-
-                return res.status(500).json({
-                    mensaje: 'Error al actualizar el usuario'
-                });
-            }
-
-            if (resultado.affectedRows === 0) {
-                return res.status(404).json({
-                    mensaje: 'Usuario no encontrado'
-                });
-            }
-
-            res.json({
-                mensaje: 'Usuario actualizado correctamente'
-            });
-        }
-    );
-};
-
-// Eliminar usuario
-const eliminarUsuario = (req, res) => {
-    const { id } = req.params;
-
-    const sql = 'DELETE FROM usuarios WHERE id = ?';
-
-    db.query(sql, [id], (error, resultado) => {
-        if (error) {
-            console.error(error);
-
-            return res.status(500).json({
-                mensaje: 'Error al eliminar el usuario'
-            });
-        }
-
-        if (resultado.affectedRows === 0) {
-            return res.status(404).json({
-                mensaje: 'Usuario no encontrado'
-            });
-        }
-
-        res.json({
-            mensaje: 'Usuario eliminado correctamente'
-        });
-    });
-};
+// ------------------------------------------------------
 // Iniciar sesión
-const iniciarSesion = (req, res) => {
-    const { correo, password } = req.body;
+// ------------------------------------------------------
+const iniciarSesion = async (req, res) => {
+    const datos = req.body || {};
 
-    if (!correo || !password) {
-        return res.status(400).json({
-            mensaje: 'El correo y la contraseña son obligatorios'
-        });
+    if (!datos.correo || !datos.password) {
+        throw new ErrorApi(400, 'El correo y la contraseña son obligatorios');
     }
 
-    const sql = `
-        SELECT
-            id,
-            nombre,
-            correo,
-            password,
-            tipo_usuario,
-            ubicacion
-        FROM usuarios
-        WHERE correo = ?
-    `;
+    const correo = String(datos.correo).trim().toLowerCase();
 
-    db.query(sql, [correo], (error, resultados) => {
-        if (error) {
-            console.error(error);
+    const { rows } = await db.query(
+        `SELECT id, nombre, correo, password_hash, tipo_usuario, ubicacion
+         FROM usuarios
+         WHERE correo = $1`,
+        [correo]
+    );
 
-            return res.status(500).json({
-                mensaje: 'Error al iniciar sesión'
-            });
-        }
+    const usuario = rows[0];
 
-        if (resultados.length === 0) {
-            return res.status(401).json({
-                mensaje: 'Correo o contraseña incorrectos'
-            });
-        }
+    const valida = await verificarPassword(
+        String(datos.password),
+        usuario ? usuario.password_hash : HASH_FALSO
+    );
 
-        const usuario = resultados[0];
+    if (!usuario || !valida) {
+        throw new ErrorApi(401, 'Correo o contraseña incorrectos');
+    }
 
-        if (usuario.password !== password) {
-            return res.status(401).json({
-                mensaje: 'Correo o contraseña incorrectos'
-            });
-        }
+    delete usuario.password_hash;
 
-        delete usuario.password;
+    const token = crearToken(
+        { id: usuario.id, nombre: usuario.nombre, tipo_usuario: usuario.tipo_usuario },
+        config.jwtSecret,
+        config.sesionHoras
+    );
 
-        res.json({
-            mensaje: 'Inicio de sesión exitoso',
-            usuario: usuario
-        });
+    res.json({
+        mensaje: 'Inicio de sesión exitoso',
+        usuario,
+        token
     });
+};
+
+// ------------------------------------------------------
+// Perfil del usuario autenticado
+// ------------------------------------------------------
+const obtenerPerfil = async (req, res) => {
+    const { rows } = await db.query(
+        `SELECT id, nombre, correo, tipo_usuario, ubicacion, fecha_registro
+         FROM usuarios
+         WHERE id = $1`,
+        [req.usuario.id]
+    );
+
+    if (rows.length === 0) {
+        throw new ErrorApi(404, 'Usuario no encontrado');
+    }
+
+    res.json(rows[0]);
+};
+
+// ------------------------------------------------------
+// Listar usuarios (solo datos públicos, sin correo)
+// ------------------------------------------------------
+const obtenerUsuarios = async (req, res) => {
+    const { rows } = await db.query(
+        `SELECT id, nombre, tipo_usuario, ubicacion, fecha_registro
+         FROM usuarios
+         ORDER BY nombre`
+    );
+
+    res.json(rows);
+};
+
+// El usuario solo puede ver, editar o eliminar su propia cuenta
+function exigirCuentaPropia(req) {
+    const id = v.idEntero(req.params.id);
+
+    if (id !== Number(req.usuario.id)) {
+        throw new ErrorApi(403, 'Solo puedes gestionar tu propia cuenta');
+    }
+
+    return id;
+}
+
+// ------------------------------------------------------
+// Obtener un usuario por ID (solo la propia cuenta)
+// ------------------------------------------------------
+const obtenerUsuarioPorId = async (req, res) => {
+    const id = exigirCuentaPropia(req);
+
+    const { rows } = await db.query(
+        `SELECT id, nombre, correo, tipo_usuario, ubicacion, fecha_registro
+         FROM usuarios
+         WHERE id = $1`,
+        [id]
+    );
+
+    if (rows.length === 0) {
+        throw new ErrorApi(404, 'Usuario no encontrado');
+    }
+
+    res.json(rows[0]);
+};
+
+// ------------------------------------------------------
+// Actualizar usuario (nombre, correo y ubicación)
+// ------------------------------------------------------
+const actualizarUsuario = async (req, res) => {
+    const id = exigirCuentaPropia(req);
+    const datos = req.body || {};
+
+    const nombre = v.texto(datos.nombre, 'nombre', { min: 2, max: 100 });
+    const correo = v.correo(datos.correo);
+    const ubicacion = v.texto(datos.ubicacion, 'ubicacion', { min: 2, max: 150 });
+
+    try {
+        const { rowCount } = await db.query(
+            `UPDATE usuarios
+             SET nombre = $1, correo = $2, ubicacion = $3
+             WHERE id = $4`,
+            [nombre, correo, ubicacion, id]
+        );
+
+        if (rowCount === 0) {
+            throw new ErrorApi(404, 'Usuario no encontrado');
+        }
+
+        res.json({ mensaje: 'Usuario actualizado correctamente' });
+    } catch (error) {
+        if (error.code === '23505') {
+            throw new ErrorApi(409, 'El correo ya está registrado');
+        }
+
+        throw error;
+    }
+};
+
+// ------------------------------------------------------
+// Eliminar usuario (solo si no tiene actividad registrada)
+// ------------------------------------------------------
+const eliminarUsuario = async (req, res) => {
+    const id = exigirCuentaPropia(req);
+
+    try {
+        const { rowCount } = await db.query('DELETE FROM usuarios WHERE id = $1', [id]);
+
+        if (rowCount === 0) {
+            throw new ErrorApi(404, 'Usuario no encontrado');
+        }
+
+        res.json({ mensaje: 'Usuario eliminado correctamente' });
+    } catch (error) {
+        if (error.code === '23503') {
+            throw new ErrorApi(409, 'No puedes eliminar la cuenta porque tiene donaciones o solicitudes registradas');
+        }
+
+        throw error;
+    }
 };
 
 module.exports = {
     registrarUsuario,
     iniciarSesion,
+    obtenerPerfil,
     obtenerUsuarios,
     obtenerUsuarioPorId,
     actualizarUsuario,

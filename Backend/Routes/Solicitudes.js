@@ -2,6 +2,8 @@ const express = require('express');
 
 const router = express.Router();
 
+const { autenticar, permitirRoles } = require('../middleware/auth');
+
 const {
     crearSolicitud,
     obtenerSolicitudes,
@@ -10,19 +12,20 @@ const {
     eliminarSolicitud
 } = require('../controllers/solicitudesController');
 
-// Crear una solicitud
-router.post('/', crearSolicitud);
+// Todas las rutas requieren sesión iniciada
+router.use(autenticar);
 
-// Obtener todas las solicitudes
+// Crear una solicitud (organizaciones)
+router.post('/', permitirRoles('organizacion'), crearSolicitud);
+
+// Listar mis solicitudes / ver una solicitud
 router.get('/', obtenerSolicitudes);
-
-// Obtener una solicitud por ID
 router.get('/:id', obtenerSolicitudPorId);
 
-// Actualizar el estado de una solicitud
-router.put('/:id', actualizarSolicitud);
+// Aceptar o rechazar una solicitud (donantes)
+router.put('/:id', permitirRoles('donante'), actualizarSolicitud);
 
-// Eliminar una solicitud
-router.delete('/:id', eliminarSolicitud);
+// Eliminar una solicitud propia (organizaciones)
+router.delete('/:id', permitirRoles('organizacion'), eliminarSolicitud);
 
 module.exports = router;

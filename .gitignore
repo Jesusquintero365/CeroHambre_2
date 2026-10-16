@@ -1,2 +1,24 @@
+# Dependencias
 node_modules/
+
+# Variables de entorno con datos reales (el modelo es .env.example)
 .env
+.env.*
+!.env.example
+
+# Registros y temporales
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Pruebas
+coverage/
+
+# Archivos temporales del informe
+docs/informe/_build/
+__pycache__/

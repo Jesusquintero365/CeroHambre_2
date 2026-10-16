@@ -1,0 +1,32 @@
+{
+  "proyecto": "CeroHambre",
+  "titulo": "CeroHambre: plataforma web para recuperar alimentos y contribuir al ODS 2 – Hambre Cero",
+  "universidad": "Universidad Cooperativa de Colombia",
+  "programa": "[Programa o facultad]",
+  "curso": "Desarrollo Sostenible",
+  "actividad": "Actividad evaluativa – Momento 2",
+  "integrantes": [
+    "Jesus Quintero",
+    "[Nombre del integrante 2]",
+    "[Nombre del integrante 3]"
+  ],
+  "docente": "[Nombre del docente]",
+  "ciudad_fecha": "Colombia, octubre de 2026",
+  "url_repo": "[https://github.com/USUARIO/REPOSITORIO]",
+  "url_app": "[https://NOMBRE-DE-LA-APP.onrender.com]",
+  "acceso_docente": "[Repositorio público, o usuario de GitHub del docente invitado como colaborador]",
+  "usuarios_prueba": [
+    {
+      "rol": "Donante",
+      "correo": "donante@cerohambre.com",
+      "clave": "Donante123*",
+      "prueba": "Publicar donaciones, aceptar o rechazar solicitudes, registrar y actualizar entregas."
+    },
+    {
+      "rol": "Organización",
+      "correo": "organizacion@cerohambre.com",
+      "clave": "Organizacion123*",
+      "prueba": "Consultar alimentos disponibles, solicitar cantidades y seguir sus solicitudes y entregas."
+    }
+  ]
+}
